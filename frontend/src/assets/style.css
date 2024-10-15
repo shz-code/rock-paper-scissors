@@ -39,7 +39,8 @@
   filter: drop-shadow(5px 5px white) drop-shadow(-5px -5px white);
 }
 
-.game_left_hands img {
+.game_left_hands img,
+.game_left_right img {
   filter: drop-shadow(5px 5px white) drop-shadow(-5px -5px white);
 }
 
