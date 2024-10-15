@@ -3,7 +3,11 @@ import { io } from "socket.io-client";
 import Home from "./components/Home/Home";
 import Layout from "./components/Layout";
 
-export const socket = io(import.meta.env.VITE_BASE_URL);
+export const socket = io(import.meta.env.VITE_BASE_URL, {
+  extraHeaders: {
+    Authentication: import.meta.env.VITE_SOCKET_KEY,
+  },
+});
 
 function App() {
   return (
