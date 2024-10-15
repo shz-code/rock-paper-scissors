@@ -38,3 +38,15 @@
   width: 100%;
   filter: drop-shadow(5px 5px white) drop-shadow(-5px -5px white);
 }
+
+.game_left_hands img {
+  filter: drop-shadow(5px 5px white) drop-shadow(-5px -5px white);
+}
+
+.controls .img_box {
+  @apply p-2 relative bg-black border-4 w-24 h-24 rounded-2xl overflow-hidden cursor-pointer;
+}
+
+.controls .img_box img {
+  @apply rotate-90 absolute bottom-1 left-0;
+}

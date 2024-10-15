@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
+import Game from "./components/Game/Game";
 import Home from "./components/Home/Home";
 import Layout from "./components/Layout";
 
@@ -19,6 +20,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/game/:id" element={<Game />} />
         </Routes>
       </Layout>
     </Router>
