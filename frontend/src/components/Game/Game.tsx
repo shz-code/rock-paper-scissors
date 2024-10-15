@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import { socket } from "../../App";
 import VS_Background from "../../assets/images/battle.jpg";
 import Paper from "../../assets/images/paper.png";
 import Rock from "../../assets/images/rock.png";
@@ -13,6 +14,51 @@ const Game = () => {
   const { id } = useParams();
 
   const [options, setOptions] = useState<string | null>(null);
+  const [foundOpponent, setFoundOpponent] = useState<boolean>(false);
+  const [roomData, setRoomData] = useState<object | null>(null);
+  const [locked, setLocked] = useState<boolean>(false);
+
+  useEffect(() => {
+    socket.emit(`game:check`, id, (data) => {
+      if (!data.isAvailable) {
+        setFoundOpponent(true);
+        setRoomData(data);
+      }
+    });
+
+    socket.on(
+      `game:get:${id}`,
+      ({ status, data }: { status: string; data: Room }) => {
+        if (status === "joined") {
+          setFoundOpponent(true);
+          setRoomData(data);
+        }
+      }
+    );
+
+    socket.on(`game:update:${id}`, (data) => {
+      setLocked(false);
+      console.log(data);
+    });
+
+    // socket.on("game:delete", (res) => {
+    //   console.log("opponent left");
+    // });
+
+    return () => {
+      socket.emit(`game:delete`, id);
+      socket.off(`game:get:${id}`);
+      socket.off(`game:update:${id}`);
+      //   socket.off(`game:delete`);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (options) {
+      setLocked(true);
+      socket.emit("game:update", { id: id, option: options });
+    }
+  }, [options]);
 
   return (
     <div className="relative h-full">
@@ -36,28 +82,38 @@ const Game = () => {
               {(options === "rock" || !options) && (
                 <img
                   src={Rock}
-                  className="rotate-[180deg] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
+                  className="transform scale-x-[-1] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
                 />
               )}
               {options === "paper" && (
                 <img
                   src={Paper}
-                  className="rotate-[180deg] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
+                  className="transform scale-x-[-1] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
                 />
               )}
               {options === "scissors" && (
                 <img
                   src={Scissors}
-                  className="rotate-[180deg] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
+                  className="transform scale-x-[-1] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
                 />
               )}
             </div>
           </div>
         </div>
-        <Opponent />
+        {foundOpponent ? (
+          <Opponent />
+        ) : (
+          <div className="flex flex-col justify-center items-center w-full translate-x-[120px]">
+            <div className="mb-4">
+              <CgProfile className="h-20 w-20 bg-green-400 border-4 rounded-2xl animate-bounce" />
+            </div>
+            <h3 className="text-2xl font-semibold">Looking for opponent...</h3>
+          </div>
+        )}
       </div>
-
-      <Controls options={options} setOptions={setOptions} />
+      {foundOpponent && (
+        <Controls options={options} setOptions={setOptions} locked={locked} />
+      )}
     </div>
   );
 };

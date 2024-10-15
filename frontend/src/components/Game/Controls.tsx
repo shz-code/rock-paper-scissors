@@ -5,13 +5,16 @@ import Rock from "../../assets/images/rock.png";
 import Scissors from "../../assets/images/scissors.png";
 
 interface ControlsProps {
-  options: string;
+  options: string | null;
   setOptions: React.Dispatch<React.SetStateAction<string | null>>;
+  locked: boolean;
 }
 
-const Controls: FC<ControlsProps> = ({ setOptions, options }) => {
+const Controls: FC<ControlsProps> = ({ setOptions, options, locked }) => {
   const setMove = (e) => {
-    setOptions(e.target.getAttribute("data-target"));
+    if (!locked) {
+      setOptions(e.target.getAttribute("data-target"));
+    }
   };
   return (
     <div className="controls absolute top-0 bottom-0 w-full h-full flex items-end">

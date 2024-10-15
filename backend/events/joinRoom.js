@@ -18,7 +18,10 @@ const JoinRoom = (io, socket, rooms) => {
           rooms[ck] = data;
 
           socket.join(data.room_id);
-          socket.to(data.room_id).emit("game_room", rooms[ck]);
+          socket.to(data.room_id).emit(`game:get:${data.room_id}`, {
+            status: "joined",
+            data: rooms[ck],
+          });
 
           cb({ status: "found", data: rooms[ck] });
         } else {
@@ -28,7 +31,10 @@ const JoinRoom = (io, socket, rooms) => {
             isAvailable: true,
             room_id: nanoid(),
             score: {
-              [socket.id]: 0,
+              [socket.id]: {
+                lastOption: "",
+                moveCount: 0,
+              },
             },
             isPrivate: false,
           };

@@ -13,6 +13,9 @@ const Home = () => {
     socket.on("game_room", (msg) => {
       console.log(msg);
     });
+    return () => {
+      socket.off("game_room");
+    };
   }, []);
 
   const handleFriendGame = () => {

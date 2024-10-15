@@ -31,7 +31,7 @@
   filter: drop-shadow(5px 5px white) drop-shadow(-5px -5px white);
 }
 .home_right .home_rock {
-  @apply absolute -bottom-12 -translate-x-[200px] rotate-[-50deg] hidden md:block;
+  @apply absolute -bottom-12 -translate-x-[200px] rotate-[120deg] hidden md:block;
 }
 .home_right .home_rock img {
   max-width: 500px;
