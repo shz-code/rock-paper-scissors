@@ -1,6 +1,9 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { io } from "socket.io-client";
 import Home from "./components/Home/Home";
 import Layout from "./components/Layout";
+
+export const socket = io(import.meta.env.VITE_BASE_URL);
 
 function App() {
   return (

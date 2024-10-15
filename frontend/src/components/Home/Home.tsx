@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid";
+import { socket } from "../../App";
 import Rock from "../../assets/images/rock.png";
 import Scissors from "../../assets/images/scissors.png";
 import Button from "../ui/Button";
@@ -20,9 +22,16 @@ const Home = () => {
           <div className="home_rock">
             <img src={Rock} alt="Rock photo" />
           </div>
-          <div className="buttons flex flex-col items-center md:items-end mt-56 gap-4">
+          <div className="buttons flex flex-col items-center md:items-end mt-12 md:mt-56 gap-4">
             <Button className="max-w-xs w-full">Play with Friend</Button>
-            <Button className="max-w-xs w-full">Play with Stranger</Button>
+            <Button
+              className="max-w-xs w-full"
+              onClick={() => {
+                socket.emit("join_room-stranger", { room_id: nanoid() });
+              }}
+            >
+              Play with Stranger
+            </Button>
           </div>
         </div>
       </div>
