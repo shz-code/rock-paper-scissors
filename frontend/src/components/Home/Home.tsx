@@ -1,5 +1,5 @@
-import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { socket } from "../../App";
 import Rock from "../../assets/images/rock.png";
 import Scissors from "../../assets/images/scissors.png";
@@ -7,6 +7,7 @@ import Button from "../ui/Button";
 
 const Home = () => {
   const [room, setRoom] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.on("game_room", (msg) => {
@@ -16,19 +17,20 @@ const Home = () => {
 
   const handleFriendGame = () => {
     if (!room) {
-      const room_id = nanoid();
       setRoom(room_id);
-      socket.emit("join_room", { type: "friend" });
+      socket.emit("game:create", { type: "friend" });
     }
   };
 
   const handleStrangerGame = () => {
     if (!room || true) {
-      const room_id = nanoid();
-      setRoom(room_id);
-      socket.emit("join_room", { type: "stranger" }, (res) => {
-        console.log(res);
-      });
+      socket.emit(
+        "game:create",
+        { type: "stranger" },
+        ({ status, data }: { status: boolean; data: Room }) => {
+          navigate(`/game/${data.room_id}`);
+        }
+      );
     }
   };
 

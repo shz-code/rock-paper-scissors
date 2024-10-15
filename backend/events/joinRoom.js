@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 
 const JoinRoom = (io, socket, rooms) => {
-  socket.on("join_room", (data, cb) => {
+  socket.on("game:create", (data, cb) => {
     const { room, type } = data;
     switch (type) {
       case "friend":
