@@ -1,8 +1,9 @@
-const express = require("express");
-const { createServer } = require("http");
-const morgan = require("morgan");
-const cors = require("cors");
-const { Server } = require("socket.io");
+import cors from "cors";
+import express from "express";
+import { createServer } from "http";
+import morgan from "morgan";
+import IOServer from "./io.js";
+import IOConnections from "./socketConnections.js";
 
 const app = express();
 const server = createServer(app);
@@ -10,8 +11,8 @@ const server = createServer(app);
 app.use(morgan("dev"));
 app.use(cors());
 
-const io = require("./io")(server);
-require("./socketConnections")(io);
+const ioServer = IOServer(server);
+IOConnections(ioServer);
 
 app.get("/", (req, res) => {
   console.log("hello");
