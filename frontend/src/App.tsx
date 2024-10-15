@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
 import Home from "./components/Home/Home";
@@ -10,6 +11,9 @@ export const socket = io(import.meta.env.VITE_BASE_URL, {
 });
 
 function App() {
+  useEffect(() => {
+    socket.on("auth:failed", (res) => console.error(res));
+  }, []);
   return (
     <Router>
       <Layout>

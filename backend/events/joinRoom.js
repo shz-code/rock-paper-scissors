@@ -40,8 +40,6 @@ const JoinRoom = (io, socket, rooms) => {
       default:
         break;
     }
-
-    console.log(rooms);
   });
 };
 

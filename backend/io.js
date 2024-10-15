@@ -2,16 +2,21 @@ import { Server } from "socket.io";
 
 const IOServer = (server) => {
   const withAuth = (socket, next) => {
-    const apiKey = socket.handshake.headers.authentication;
-    if (!apiKey.startsWith("Bearer")) {
+    const apiKey = socket.handshake.headers.authentication ?? null;
+
+    if (!apiKey || !apiKey.startsWith("Bearer")) {
+      socket.emit("auth:failed", "No token provided");
       next(new Error("Authentication error"));
+    } else {
+      const key = apiKey.split(" ")[1];
+      if (key !== "1234") {
+        socket.emit("auth:failed", "Wrong key");
+        next(new Error("Authentication error"));
+      }
+      next();
     }
-    const key = apiKey.split(" ")[1];
-    if (key !== "1234") {
-      next(new Error("Authentication error"));
-    }
-    next();
   };
+
   const io = new Server(server, {
     cors: {
       origin: "*",
