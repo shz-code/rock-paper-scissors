@@ -1,3 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.home_left {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 9rem;
+  text-transform: uppercase;
+}
+
+.home_left h1 {
+  @apply text-[7rem] md:text-[10rem];
+}
+.home_left h2 {
+  @apply text-[5.8rem] md:text-[8.3rem] -mt-[3rem] md:-mt-[0.5rem];
+}
+.home_left h3 {
+  @apply text-[4rem] md:text-[5.4rem] -mt-[4.3rem] md:-mt-[2.5rem];
+}
+
+.home_right .home_scissors {
+  @apply absolute top-0 -right-16 translate-y-[100px] rotate-[30deg] hidden md:block;
+}
+.home_right .home_scissors img {
+  max-width: 500px;
+  width: 100%;
+  filter: drop-shadow(5px 5px white) drop-shadow(-5px -5px white);
+}
+.home_right .home_rock {
+  @apply absolute -bottom-12 -translate-x-[200px] rotate-[-50deg] hidden md:block;
+}
+.home_right .home_rock img {
+  max-width: 500px;
+  width: 100%;
+  filter: drop-shadow(5px 5px white) drop-shadow(-5px -5px white);
+}
