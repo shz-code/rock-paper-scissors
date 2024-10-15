@@ -11,9 +11,13 @@ const JoinRoom = (io, socket, rooms) => {
         const ck = rooms.findIndex((r) => r.isAvailable && !r.isPrivate);
         if (ck != -1) {
           const data = rooms[ck];
-          (data.player2 = socket.id),
-            (data.isAvailable = false),
-            (data.score[socket.id] = 0);
+          data.player2 = socket.id;
+          data.isAvailable = false;
+          data.score[socket.id] = {
+            lastOption: "",
+            moveCount: 0,
+            winCount: 0,
+          };
 
           rooms[ck] = data;
 
@@ -34,6 +38,7 @@ const JoinRoom = (io, socket, rooms) => {
               [socket.id]: {
                 lastOption: "",
                 moveCount: 0,
+                winCount: 0,
               },
             },
             isPrivate: false,

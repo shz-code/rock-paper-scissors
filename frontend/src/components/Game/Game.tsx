@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { FaStar } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { socket } from "../../App";
 import VS_Background from "../../assets/images/battle.jpg";
 import Paper from "../../assets/images/paper.png";
@@ -12,6 +12,7 @@ import Opponent from "./Opponent";
 
 const Game = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [options, setOptions] = useState<string | null>(null);
   const [foundOpponent, setFoundOpponent] = useState<boolean>(false);
@@ -36,27 +37,32 @@ const Game = () => {
       }
     );
 
-    socket.on(`game:update:${id}`, (data) => {
-      setLocked(false);
-      console.log(data);
+    socket.on(`game:update:${id}`, ({ locked, winner }) => {
+      if (winner === socket.id) {
+        alert("You won");
+      }
+      if (!locked) setLocked(false);
     });
 
     // socket.on("game:delete", (res) => {
-    //   console.log("opponent left");
+    //   console.log(res);
+
+    //   navigate(`/game/result/${id}`);
     // });
 
     return () => {
-      socket.emit(`game:delete`, id);
       socket.off(`game:get:${id}`);
       socket.off(`game:update:${id}`);
-      //   socket.off(`game:delete`);
+      socket.off(`game:delete`);
     };
   }, []);
 
   useEffect(() => {
     if (options) {
       setLocked(true);
-      socket.emit("game:update", { id: id, option: options });
+      socket.emit("game:update", { id: id, option: options }, (res) => {
+        setLocked(false);
+      });
     }
   }, [options]);
 
