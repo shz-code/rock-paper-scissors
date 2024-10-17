@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { FaStar } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
-import { socket } from "../../App";
 import VS_Background from "../../assets/images/battle.jpg";
 import Paper from "../../assets/images/paper.png";
 import Rock from "../../assets/images/rock.png";
 import Scissors from "../../assets/images/scissors.png";
+import socket from "../../lib/socket";
 import Controls from "./Controls";
 import Opponent from "./Opponent";
 
@@ -14,7 +14,11 @@ const Game = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [options, setOptions] = useState<string | null>(null);
+  const [options, setOptions] = useState<string>(null);
+  const [persistOptions, setPersistOptions] = useState<string | null>("rock");
+  const [playerData, setPlayerData] = useState<PlayerData | null>(null);
+  const [opponentData, setOpponentData] = useState<PlayerData | null>(null);
+
   const [foundOpponent, setFoundOpponent] = useState<boolean>(false);
   const [roomData, setRoomData] = useState<object | null>(null);
   const [locked, setLocked] = useState<boolean>(false);
@@ -37,12 +41,36 @@ const Game = () => {
       }
     );
 
-    socket.on(`game:update:${id}`, ({ locked, winner }) => {
-      if (winner === socket.id) {
-        alert("You won");
+    socket.on(
+      `game:update:${id}`,
+      ({
+        locked,
+        winner,
+        loser,
+        draw,
+        room,
+        player,
+        opponent,
+      }: {
+        room: Room;
+      }) => {
+        if (winner === socket.id) {
+          // alert("You won");
+        } else if (loser === socket.id) {
+          // alert("You lost");
+        } else if (draw) {
+          // alert("game drawn");
+        }
+        if (!locked) {
+          setLocked(false);
+          setPersistOptions(room.score[socket.id].lastOption);
+          setOptions(null);
+          setPlayerData(room.score[socket.id]);
+          let opponentId = opponent === socket.id ? player : opponent;
+          setOpponentData(room.score[opponentId]);
+        }
       }
-      if (!locked) setLocked(false);
-    });
+    );
 
     // socket.on("game:delete", (res) => {
     //   console.log(res);
@@ -53,6 +81,7 @@ const Game = () => {
     return () => {
       socket.off(`game:get:${id}`);
       socket.off(`game:update:${id}`);
+      // socket.off(`game:update:${id}`);
       socket.off(`game:delete`);
     };
   }, []);
@@ -60,9 +89,7 @@ const Game = () => {
   useEffect(() => {
     if (options) {
       setLocked(true);
-      socket.emit("game:update", { id: id, option: options }, (res) => {
-        setLocked(false);
-      });
+      socket.emit("game:update", { id: id, option: options });
     }
   }, [options]);
 
@@ -79,25 +106,41 @@ const Game = () => {
             <div className="flex gap-4 p-2 mt-5 ml-5">
               <CgProfile className="h-20 w-20 bg-orange-400 border-4 rounded-2xl" />
               <div className="flex gap-4 items-center">
-                <FaStar className="h-12 w-12 fill-orange-700" />
-                <FaStar className="h-12 w-12" />
-                <FaStar className="h-12 w-12" />
+                {playerData &&
+                  Array(playerData.winCount)
+                    .fill(0)
+                    .map((_, i) => (
+                      <FaStar key={i} className="h-12 w-12 fill-orange-700" />
+                    ))}
+
+                {playerData &&
+                  Array(3 - playerData.winCount)
+                    .fill(0)
+                    .map((_, i) => <FaStar key={i} className="h-12 w-12" />)}
+
+                {!playerData && (
+                  <>
+                    <FaStar className="h-12 w-12" />
+                    <FaStar className="h-12 w-12" />
+                    <FaStar className="h-12 w-12" />
+                  </>
+                )}
               </div>
             </div>
             <div className="game_left_hands -ml-12">
-              {(options === "rock" || !options) && (
+              {(options === "rock" || persistOptions === "rock") && (
                 <img
                   src={Rock}
                   className="transform scale-x-[-1] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
                 />
               )}
-              {options === "paper" && (
+              {(options === "paper" || persistOptions === "paper") && (
                 <img
                   src={Paper}
                   className="transform scale-x-[-1] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
                 />
               )}
-              {options === "scissors" && (
+              {(options === "scissors" || persistOptions === "scissors") && (
                 <img
                   src={Scissors}
                   className="transform scale-x-[-1] absolute top-1/2 -translate-y-1/2 max-w-[400px]"
@@ -107,7 +150,7 @@ const Game = () => {
           </div>
         </div>
         {foundOpponent ? (
-          <Opponent />
+          <Opponent opponentData={opponentData} />
         ) : (
           <div className="flex flex-col justify-center items-center w-full translate-x-[120px]">
             <div className="mb-4">
@@ -118,7 +161,12 @@ const Game = () => {
         )}
       </div>
       {foundOpponent && (
-        <Controls options={options} setOptions={setOptions} locked={locked} />
+        <Controls
+          options={options}
+          setOptions={setOptions}
+          setPersistOption={setPersistOptions}
+          locked={locked}
+        />
       )}
     </div>
   );

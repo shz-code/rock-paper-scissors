@@ -20,5 +20,5 @@ app.get("/", (req, res) => {
 });
 
 server.listen(3000, "0.0.0.0", () => {
-  console.log("Listing on port http://192.168.0.110:3000/");
+  console.log("Listing on port http://localhost:3000/");
 });

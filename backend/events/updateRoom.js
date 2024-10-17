@@ -1,5 +1,7 @@
+import result from "../lib/calcWinner.js";
+
 const UpdateRoom = (io, socket, rooms) => {
-  socket.on(`game:update`, (data, cb) => {
+  socket.on(`game:update`, (data) => {
     const { id, option } = data;
 
     const roomId = rooms.findIndex((r) => r.room_id === id);
@@ -7,6 +9,7 @@ const UpdateRoom = (io, socket, rooms) => {
       const room = rooms[roomId];
 
       const player = room.player1 === socket.id ? room.player1 : room.player2;
+      const opponent = room.player1 === player ? room.player2 : room.player1;
 
       room.score[player].moveCount++;
       room.score[player].lastOption = option;
@@ -18,11 +21,28 @@ const UpdateRoom = (io, socket, rooms) => {
         let player1Option = room.score[room.player1].lastOption;
         let player2Option = room.score[room.player2].lastOption;
 
-        let winner = room.player1;
+        const { winner, loser, draw } = result(
+          player1Option,
+          player2Option,
+          room.player1,
+          room.player2
+        );
+
+        if (winner) room.score[winner].winCount++;
 
         console.log(player1Option, player2Option);
-        io.to(id).emit(`game:update:${id}`, { locked: false, winner });
-        cb({ locked: false, winner });
+        // Broadcast to all players
+        io.to(id).emit(`game:update:${id}`, {
+          locked: false,
+          winner,
+          loser,
+          draw,
+          room,
+          player: player,
+          opponent,
+        });
+        // Callback
+        // cb();
       }
     }
   });

@@ -7,12 +7,19 @@ import Scissors from "../../assets/images/scissors.png";
 interface ControlsProps {
   options: string | null;
   setOptions: React.Dispatch<React.SetStateAction<string | null>>;
+  setPersistOption: React.Dispatch<React.SetStateAction<string | null>>;
   locked: boolean;
 }
 
-const Controls: FC<ControlsProps> = ({ setOptions, options, locked }) => {
+const Controls: FC<ControlsProps> = ({
+  setOptions,
+  options,
+  locked,
+  setPersistOption,
+}) => {
   const setMove = (e) => {
     if (!locked) {
+      setPersistOption(null);
       setOptions(e.target.getAttribute("data-target"));
     }
   };

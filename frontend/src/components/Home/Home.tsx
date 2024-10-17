@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { socket } from "../../App";
 import Rock from "../../assets/images/rock.png";
 import Scissors from "../../assets/images/scissors.png";
+import socket from "../../lib/socket";
 import Button from "../ui/Button";
 
 const Home = () => {
