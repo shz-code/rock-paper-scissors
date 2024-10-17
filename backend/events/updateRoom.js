@@ -30,6 +30,11 @@ const UpdateRoom = (io, socket, rooms) => {
 
         if (winner) room.score[winner].winCount++;
 
+        let champion =
+          room.score[room.player1].winCount === 3 ? room.player1 : null;
+        champion =
+          room.score[room.player2].winCount === 3 ? room.player2 : null;
+
         console.log(player1Option, player2Option);
         // Broadcast to all players
         io.to(id).emit(`game:update:${id}`, {
@@ -40,6 +45,7 @@ const UpdateRoom = (io, socket, rooms) => {
           room,
           player: player,
           opponent,
+          champion,
         });
         // Callback
         // cb();

@@ -22,9 +22,25 @@ const Opponent = ({ opponentData }) => {
     <div className="relative">
       <div className="flex gap-4 p-2 mt-5 mr-5">
         <div className="flex gap-4 items-center">
-          <FaStar className="h-12 w-12" />
-          <FaStar className="h-12 w-12" />
-          <FaStar className="h-12 w-12 fill-green-700" />
+          {opponentData &&
+            Array(opponentData.winCount)
+              .fill(0)
+              .map((_, i) => (
+                <FaStar key={i} className="h-12 w-12 fill-green-700" />
+              ))}
+
+          {opponentData &&
+            Array(3 - opponentData.winCount)
+              .fill(0)
+              .map((_, i) => <FaStar key={i} className="h-12 w-12" />)}
+
+          {!opponentData && (
+            <>
+              <FaStar className="h-12 w-12" />
+              <FaStar className="h-12 w-12" />
+              <FaStar className="h-12 w-12" />
+            </>
+          )}
         </div>
         <CgProfile className="h-20 w-20 bg-green-400 border-4 rounded-2xl" />
       </div>

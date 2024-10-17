@@ -9,6 +9,7 @@ import Scissors from "../../assets/images/scissors.png";
 import socket from "../../lib/socket";
 import Controls from "./Controls";
 import Opponent from "./Opponent";
+import Result from "./Result";
 
 const Game = () => {
   const { id } = useParams();
@@ -18,6 +19,8 @@ const Game = () => {
   const [persistOptions, setPersistOptions] = useState<string | null>("rock");
   const [playerData, setPlayerData] = useState<PlayerData | null>(null);
   const [opponentData, setOpponentData] = useState<PlayerData | null>(null);
+
+  const [finalChampion, setFinalChampion] = useState<string | null>(null);
 
   const [foundOpponent, setFoundOpponent] = useState<boolean>(false);
   const [roomData, setRoomData] = useState<object | null>(null);
@@ -51,6 +54,7 @@ const Game = () => {
         room,
         player,
         opponent,
+        champion,
       }: {
         room: Room;
       }) => {
@@ -68,6 +72,10 @@ const Game = () => {
           setPlayerData(room.score[socket.id]);
           let opponentId = opponent === socket.id ? player : opponent;
           setOpponentData(room.score[opponentId]);
+        }
+
+        if (champion) {
+          setFinalChampion(champion);
         }
       }
     );
@@ -92,6 +100,14 @@ const Game = () => {
       socket.emit("game:update", { id: id, option: options });
     }
   }, [options]);
+
+  useEffect(() => {
+    if (finalChampion) {
+      setTimeout(() => {
+        navigate(`/`);
+      }, 2000);
+    }
+  }, [finalChampion]);
 
   return (
     <div className="relative h-full">
@@ -167,6 +183,13 @@ const Game = () => {
           setPersistOption={setPersistOptions}
           locked={locked}
         />
+      )}
+      {finalChampion && <Result champion={finalChampion} />}
+
+      {locked && (
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 grid place-items-center">
+          <p className="text-4xl">Waiting for opponent response</p>
+        </div>
       )}
     </div>
   );
